@@ -22,8 +22,9 @@ class ViewController : UIViewController {
             // Do the initial de-serialization
             // Source JSON is here:
             // https://api.coindesk.com/v1/bpi/currentprice/CAD.json
-            //
-            let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments) as! AnyObject
+            
+            // Try to parse the whole thing as an AnyObject
+            let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments)
             
             // Print retrieved JSON
             print("")
@@ -34,15 +35,29 @@ class ViewController : UIViewController {
             print("")
             print("Now, add your parsing code here...")
             
+            // cast AnyObject into a dictionary with a key that is a String and value of AnyObject
+            if let data = json as? [String : AnyObject]
+            {
+                // if this worked we have a dictionary
+                print("The value for the bpi key is")
+                print(data["bpi"])
+                
+                //now
+                if let exchangeRate = data["bpi"] as? [String : AnyObject]
+                {
+            } else {
+                print("could not convert to dictionary of String:AnyObject")
+            }
             // Now we can update the UI
             // (must be done asynchronously)
-            dispatch_async(dispatch_get_main_queue()) {
+            dispatch_async(dispatch_get_main_queue())
+            {
                 self.jsonResult.text = "parsed JSON should go here"
             }
             
-        } catch let error as NSError {
+            } catch let error as NSError {
             print ("Failed to load: \(error.localizedDescription)")
-        }
+            }
         
         
     }

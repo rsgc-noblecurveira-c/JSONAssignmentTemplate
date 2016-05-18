@@ -21,7 +21,7 @@ class ViewController : UIViewController {
             
             // Do the initial de-serialization
             // Source JSON is here:
-            // http://www.learnswiftonline.com/Samples/subway.json
+            // https://api.coindesk.com/v1/bpi/currentprice/CAD.json
             //
             let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments) as! AnyObject
             
@@ -95,7 +95,7 @@ class ViewController : UIViewController {
         }
         
         // Define a URL to retrieve a JSON file from
-        let address : String = "http://www.learnswiftonline.com/Samples/subway.json"
+        let address : String = "https://api.coindesk.com/v1/bpi/currentprice/CAD.json"
         
         // Try to make a URL request object
         if let url = NSURL(string: address) {

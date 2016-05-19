@@ -3,10 +3,17 @@
 import UIKit
 import XCPlayground
 
+
+
 class ViewController : UIViewController {
     
     // Views that need to be accessible to all methods
     let jsonResult = UILabel()
+    
+    // make variables to store the info
+    var jsonCurrency = ""
+    var jsonRate = ""
+    
     
     // If data is successfully retrieved from the server, we can parse it here
     func parseMyJSON(theData : NSData) {
@@ -54,9 +61,11 @@ class ViewController : UIViewController {
                     {
                         // if this worked, we can use this to find the dollar amount
                         // get the data into variables
-                        if let description = individualRate["description"]
+                        print("====== the variables ======")
+                        if let currency = individualRate["description"]
                         {
-                            print("\(description)")
+                            print("\(currency)")
+                            jsonCurrency = currency as! String
                         } else {
                             print("not a vaild variable")
                         }
@@ -64,6 +73,7 @@ class ViewController : UIViewController {
                         if let rate = individualRate["rate"]
                         {
                             print("$\(rate)")
+                            jsonRate = rate as! String
                         } else {
                             print("not a vaild variable")
                         }
@@ -81,7 +91,7 @@ class ViewController : UIViewController {
             // (must be done asynchronously)
             dispatch_async(dispatch_get_main_queue())
             {
-                self.jsonResult.text = "parsed JSON should go here"
+                self.jsonResult.text = "The currency is \(self.jsonCurrency) and the going rate is $\(self.jsonRate)"
             }
             
         } catch let error as NSError {
@@ -187,6 +197,7 @@ class ViewController : UIViewController {
         jsonResult.text = "..."
         jsonResult.font = UIFont.systemFontOfSize(12)
         jsonResult.numberOfLines = 0   // makes number of lines dynamic
+        
         // e.g.: multiple lines will show up
         jsonResult.textAlignment = NSTextAlignment.Center
         

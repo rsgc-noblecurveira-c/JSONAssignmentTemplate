@@ -9,10 +9,12 @@ class ViewController : UIViewController {
     
     // Views that need to be accessible to all methods
     let jsonResult = UILabel()
+    let inputGiven = UITextField(frame: CGRect(x: 0, y: 0, width: 300, height: 30))
     
     // make variables to store the info
     var jsonCurrency = ""
     var jsonRate = ""
+    let frontURL = "https://api.coindesk.com/v1/bpi/currentprice/"
     
     
     // If data is successfully retrieved from the server, we can parse it here
@@ -31,7 +33,7 @@ class ViewController : UIViewController {
             // https://api.coindesk.com/v1/bpi/currentprice/CAD.json
             
             // Try to parse the whole thing as an AnyObject
-            let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments) as! AnyObject
+            let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments)
             
             // Print retrieved JSON
             print("")
@@ -54,10 +56,10 @@ class ViewController : UIViewController {
                 {
                     //if it worked we can now go into each currency and find the value
                     print("Canadian dollar amount")
-                    print(exchangeRate["CAD"])
+                    print(exchangeRate[inputGiven.text!])
                     
                     // keep going deeper
-                    if let individualRate = exchangeRate["CAD"] as? [String : AnyObject]
+                    if let individualRate = exchangeRate[inputGiven.text!] as? [String : AnyObject]
                     {
                         // if this worked, we can use this to find the dollar amount
                         // get the data into variables
@@ -79,7 +81,7 @@ class ViewController : UIViewController {
                         }
 
                     } else {
-                        print("could not find the canadian dollar amount")
+                        print("could not find the currency")
                     }
                 } else {
                     print("could not convert bpi data into a dictionary")
@@ -91,7 +93,7 @@ class ViewController : UIViewController {
             // (must be done asynchronously)
             dispatch_async(dispatch_get_main_queue())
             {
-                self.jsonResult.text = "The currency is \(self.jsonCurrency) and the going rate is $\(self.jsonRate)"
+                self.jsonResult.text = "The currency is \(self.jsonCurrency)\n and the going rate is $\(self.jsonRate)"
             }
             
         } catch let error as NSError {
@@ -148,30 +150,37 @@ class ViewController : UIViewController {
             
         }
         
-        // Define a URL to retrieve a JSON file from
-        let address : String = "https://api.coindesk.com/v1/bpi/currentprice/CAD.json"
+        func createURL() -> String
+        {
+            let url: String = frontURL + inputGiven.text! + ".json"
+            return url
+        }
         
+        // Define a URL to retrieve a JSON file from
+        if let address : String = createURL()
+        {
+            if let url = NSURL(string: address) {
+                
+                // We have an valid URL to work with
+                print(url)
+                
+                // Now we create a URL request object
+                let urlRequest = NSURLRequest(URL: url)
+                
+                // Now we need to create an NSURLSession object to send the request to the server
+                let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+                let session = NSURLSession(configuration: config)
+                
+                // Now we create the data task and specify the completion handler
+                let task = session.dataTaskWithRequest(urlRequest, completionHandler: myCompletionHandler)
+                
+                // Finally, we tell the task to start (despite the fact that the method is named "resume")
+                task.resume()
+                
+            }
+        }
         // Try to make a URL request object
-        if let url = NSURL(string: address) {
-            
-            // We have an valid URL to work with
-            print(url)
-            
-            // Now we create a URL request object
-            let urlRequest = NSURLRequest(URL: url)
-            
-            // Now we need to create an NSURLSession object to send the request to the server
-            let config = NSURLSessionConfiguration.defaultSessionConfiguration()
-            let session = NSURLSession(configuration: config)
-            
-            // Now we create the data task and specify the completion handler
-            let task = session.dataTaskWithRequest(urlRequest, completionHandler: myCompletionHandler)
-            
-            // Finally, we tell the task to start (despite the fact that the method is named "resume")
-            task.resume()
-            
-        } else {
-            
+         else {
             // The NSURL object could not be created
             print("Error: Cannot create the NSURL object.")
             
@@ -223,6 +232,23 @@ class ViewController : UIViewController {
         
         // Add the button into the super view
         view.addSubview(getData)
+        
+        /*
+         * Add a label
+         */
+        inputGiven.borderStyle = UITextBorderStyle.RoundedRect
+        inputGiven.font = UIFont.systemFontOfSize(15)
+        inputGiven.placeholder = "ex: USD"
+        inputGiven.backgroundColor = UIColor.whiteColor()
+        inputGiven.contentVerticalAlignment = UIControlContentVerticalAlignment.Center
+        inputGiven.textAlignment = NSTextAlignment.Center
+        
+        // Required to autolayout this field
+        inputGiven.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add the amount text field into the superview
+        view.addSubview(inputGiven)
+        
         
         /*
          * Layout all the interface elements

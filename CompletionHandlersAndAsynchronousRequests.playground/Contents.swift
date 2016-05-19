@@ -52,22 +52,38 @@ class ViewController : UIViewController {
                     // keep going deeper
                     if let individualRate = exchangeRate["CAD"] as? [String : AnyObject]
                     {
-                        //if this worked, we can use this to find the dollar amount
-                        print(individualRate["description"])
-                        print(individualRate["rate"])
-                    } else {
-                        print("could not convert ")
+                        // if this worked, we can use this to find the dollar amount
+                        // get the data into variables
+                        if let description = individualRate["description"]
+                        {
+                            print("\(description)")
+                        } else {
+                            print("not a vaild variable")
                         }
+                        
+                        if let rate = individualRate["rate"]
+                        {
+                            print("$\(rate)")
+                        } else {
+                            print("not a vaild variable")
+                        }
+
+                    } else {
+                        print("could not find the canadian dollar amount")
+                    }
                 } else {
-                    print("could not convert to dictionary of String:AnyObject")
+                    print("could not convert bpi data into a dictionary")
                 }
-                // Now we can update the UI
-                // (must be done asynchronously)
-                dispatch_async(dispatch_get_main_queue())
-                {
-                    self.jsonResult.text = "parsed JSON should go here"
-                }
+            } else {
+                print("could not convert to dictionary of String:AnyObject")
             }
+            // Now we can update the UI
+            // (must be done asynchronously)
+            dispatch_async(dispatch_get_main_queue())
+            {
+                self.jsonResult.text = "parsed JSON should go here"
+            }
+            
         } catch let error as NSError {
             print ("Failed to load: \(error.localizedDescription)")
         }

@@ -24,7 +24,7 @@ class ViewController : UIViewController {
             // https://api.coindesk.com/v1/bpi/currentprice/CAD.json
             
             // Try to parse the whole thing as an AnyObject
-            let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments)
+            let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments) as? AnyObject
             
             // Print retrieved JSON
             print("")
@@ -45,26 +45,27 @@ class ViewController : UIViewController {
                 //now
                 if let exchangeRate = data["bpi"] as? [String : AnyObject]
                 {
-            } else {
-                print("could not convert to dictionary of String:AnyObject")
+                    
+                } else {
+                    print("could not convert to dictionary of String:AnyObject")
+                }
+                // Now we can update the UI
+                // (must be done asynchronously)
+                dispatch_async(dispatch_get_main_queue())
+                {
+                    self.jsonResult.text = "parsed JSON should go here"
+                }
             }
-            // Now we can update the UI
-            // (must be done asynchronously)
-            dispatch_async(dispatch_get_main_queue())
-            {
-                self.jsonResult.text = "parsed JSON should go here"
-            }
-            
-            } catch let error as NSError {
+        } catch let error as NSError {
             print ("Failed to load: \(error.localizedDescription)")
-            }
+        }
         
         
     }
     
     // Set up and begin an asynchronous request for JSON data
     func getMyJSON() {
-
+        
         // Define a completion handler
         // The completion handler is what gets called when this **asynchronous** network request is completed.
         // This is where we'd process the JSON retrieved
@@ -84,8 +85,8 @@ class ViewController : UIViewController {
                 
                 // If the request was successful, parse the given data
                 if r.statusCode == 200 {
-        
-                    // Show debug information (if a request was completed successfully)            
+                    
+                    // Show debug information (if a request was completed successfully)
                     print("")
                     print("====== data from the request follows ======")
                     print(data)
@@ -95,7 +96,7 @@ class ViewController : UIViewController {
                     print("")
                     print("====== errors from the request follows ======")
                     print(error)
-            
+                    
                     if let d = data {
                         
                         // Parse the retrieved data
@@ -146,10 +147,10 @@ class ViewController : UIViewController {
         // Sub-classes of UIViewController must invoke the superclass method viewDidLoad in their
         // own version of viewDidLoad()
         super.viewDidLoad()
-
+        
         // Make the view's background be gray
         view.backgroundColor = UIColor.lightGrayColor()
-
+        
         /*
          * Further define label that will show JSON data
          */
@@ -166,7 +167,7 @@ class ViewController : UIViewController {
         
         // Add the label to the superview
         view.addSubview(jsonResult)
-
+        
         /*
          * Add a button
          */
@@ -183,7 +184,7 @@ class ViewController : UIViewController {
         
         // Add the button into the super view
         view.addSubview(getData)
-
+        
         /*
          * Layout all the interface elements
          */

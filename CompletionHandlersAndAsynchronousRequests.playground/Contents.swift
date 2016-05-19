@@ -24,7 +24,7 @@ class ViewController : UIViewController {
             // https://api.coindesk.com/v1/bpi/currentprice/CAD.json
             
             // Try to parse the whole thing as an AnyObject
-            let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments) as? AnyObject
+            let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments) as! AnyObject
             
             // Print retrieved JSON
             print("")
@@ -42,10 +42,22 @@ class ViewController : UIViewController {
                 print("The value for the bpi key is")
                 print(data["bpi"])
                 
-                //now
+                //now we must go deeper to find the actual value of bitcoins
                 if let exchangeRate = data["bpi"] as? [String : AnyObject]
                 {
+                    //if it worked we can now go into each currency and find the value
+                    print("Canadian dollar amount")
+                    print(exchangeRate["CAD"])
                     
+                    // keep going deeper
+                    if let individualRate = exchangeRate["CAD"] as? [String : AnyObject]
+                    {
+                        //if this worked, we can use this to find the dollar amount
+                        print(individualRate["description"])
+                        print(individualRate["rate"])
+                    } else {
+                        print("could not convert ")
+                        }
                 } else {
                     print("could not convert to dictionary of String:AnyObject")
                 }

@@ -5,18 +5,32 @@ import XCPlayground
 
 
 
-class ViewController : UIViewController {
+class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataSource
+{
     
     // Views that need to be accessible to all methods
     let jsonResult = UILabel()
     let inputGiven = UITextField(frame: CGRect(x: 0, y: 0, width: 300, height: 30))
-    
+//    let countryPicker = UIPickerViewDelegate()
     // make variables to store the info
     var jsonCurrency = ""
     var jsonRate = ""
     let frontURL = "https://api.coindesk.com/v1/bpi/currentprice/"
+    var pickerData: [String] = ["pee"]
     
     
+//    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int
+//    {
+//        return 1
+//    }
+//    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int
+//    {
+//        return pickerData.count
+//    }
+//    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String?
+//    {
+//        return pickerData[row]
+//    }
     // If data is successfully retrieved from the server, we can parse it here
     func parseMyJSON(theData : NSData) {
         
@@ -30,8 +44,7 @@ class ViewController : UIViewController {
             
             // Do the initial de-serialization
             // Source JSON is here:
-            // https://api.coindesk.com/v1/bpi/currentprice/CAD.json
-            
+            // https://api.coindesk.com/v1/bpi/currentprice/<CODE>.json
             // Try to parse the whole thing as an AnyObject
             let json = try NSJSONSerialization.JSONObjectWithData(theData, options: NSJSONReadingOptions.AllowFragments)
             
@@ -43,21 +56,19 @@ class ViewController : UIViewController {
             // Now we can parse this...
             print("")
             print("Now, add your parsing code here...")
-            
+
             // cast AnyObject into a dictionary with a key that is a String and value of AnyObject
             if let data = json as? [String : AnyObject]
             {
                 // if this worked we have a dictionary
                 print("The value for the bpi key is")
                 print(data["bpi"])
-                
                 //now we must go deeper to find the actual value of bitcoins
                 if let exchangeRate = data["bpi"] as? [String : AnyObject]
                 {
                     //if it worked we can now go into each currency and find the value
                     print("Canadian dollar amount")
                     print(exchangeRate[inputGiven.text!])
-                    
                     // keep going deeper
                     if let individualRate = exchangeRate[inputGiven.text!] as? [String : AnyObject]
                     {
@@ -95,14 +106,22 @@ class ViewController : UIViewController {
             {
                 self.jsonResult.text = "The currency is \(self.jsonCurrency)\n and the going rate is $\(self.jsonRate)"
             }
-            
         } catch let error as NSError {
             print ("Failed to load: \(error.localizedDescription)")
         }
-        
-        
     }
-    
+    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int
+    {
+        return 1
+    }
+    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int
+    {
+        return pickerData.count
+    }
+    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String?
+    {
+        return pickerData[row]
+    }
     // Set up and begin an asynchronous request for JSON data
     func getMyJSON() {
         
@@ -249,7 +268,6 @@ class ViewController : UIViewController {
         // Add the amount text field into the superview
         view.addSubview(inputGiven)
         
-        
         /*
          * Layout all the interface elements
          */
@@ -263,11 +281,12 @@ class ViewController : UIViewController {
         // Create a dictionary of views that will be used in the layout constraints defined below
         let viewsDictionary : [String : AnyObject] = [
             "title": jsonResult,
-            "getData": getData]
+            "getData": getData,
+            "input": inputGiven]
         
         // Define the vertical constraints
         let verticalConstraints = NSLayoutConstraint.constraintsWithVisualFormat(
-            "V:|-50-[getData]-[title]",
+            "V:|-50-[getData]-[input]-[title]",
             options: [],
             metrics: nil,
             views: viewsDictionary)

@@ -104,7 +104,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             // (must be done asynchronously)
             dispatch_async(dispatch_get_main_queue())
             {
-                self.jsonResult.text = "The currency is \(self.jsonCurrency)\n and the going rate is $\(self.jsonRate)"
+                self.jsonResult.text = "The currency is the \(self.jsonCurrency)/n and one BitCoin is $\(self.jsonRate)"
             }
         } catch let error as NSError {
             print ("Failed to load: \(error.localizedDescription)")
@@ -197,9 +197,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
                 task.resume()
                 
             }
-        }
-        // Try to make a URL request object
-         else {
+        } else {
             // The NSURL object could not be created
             print("Error: Cannot create the NSURL object.")
             

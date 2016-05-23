@@ -11,7 +11,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     // Views that need to be accessible to all methods
     let jsonResult = UILabel()
     let inputGiven = UITextField(frame: CGRect(x: 0, y: 0, width: 300, height: 30))
-//    let countryPicker = UIPickerViewDelegate()
+    //    let countryPicker = UIPickerViewDelegate()
     // make variables to store the info
     var jsonCurrency = ""
     var jsonRate = ""
@@ -19,18 +19,18 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     var pickerData: [String] = ["pee"]
     
     
-//    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int
-//    {
-//        return 1
-//    }
-//    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int
-//    {
-//        return pickerData.count
-//    }
-//    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String?
-//    {
-//        return pickerData[row]
-//    }
+    //    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int
+    //    {
+    //        return 1
+    //    }
+    //    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int
+    //    {
+    //        return pickerData.count
+    //    }
+    //    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String?
+    //    {
+    //        return pickerData[row]
+    //    }
     // If data is successfully retrieved from the server, we can parse it here
     func parseMyJSON(theData : NSData) {
         
@@ -56,7 +56,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             // Now we can parse this...
             print("")
             print("Now, add your parsing code here...")
-
+            
             // cast AnyObject into a dictionary with a key that is a String and value of AnyObject
             if let data = json as? [String : AnyObject]
             {
@@ -90,7 +90,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
                         } else {
                             print("not a vaild variable")
                         }
-
+                        
                     } else {
                         print("could not find the currency")
                     }
@@ -104,7 +104,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             // (must be done asynchronously)
             dispatch_async(dispatch_get_main_queue())
             {
-                self.jsonResult.text = "The currency is the \(self.jsonCurrency)/n and one BitCoin is $\(self.jsonRate)"
+                self.jsonResult.text = "The currency is the \(self.jsonCurrency)\n and one BitCoin is $\(self.jsonRate)"
             }
         } catch let error as NSError {
             print ("Failed to load: \(error.localizedDescription)")
@@ -123,56 +123,66 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
         return pickerData[row]
     }
     // Set up and begin an asynchronous request for JSON data
-    func getMyJSON() {
+    func getMyJSON()
+    {
         
         // Define a completion handler
         // The completion handler is what gets called when this **asynchronous** network request is completed.
         // This is where we'd process the JSON retrieved
-        let myCompletionHandler : (NSData?, NSURLResponse?, NSError?) -> Void = {
-            
-            (data, response, error) in
-            
-            // This is the code run when the network request completes
-            // When the request completes:
-            //
-            // data - contains the data from the request
-            // response - contains the HTTP response code(s)
-            // error - contains any error messages, if applicable
-            
-            // Cast the NSURLResponse object into an NSHTTPURLResponse objecct
-            if let r = response as? NSHTTPURLResponse {
+        let myCompletionHandler : (NSData?, NSURLResponse?, NSError?) -> Void =
+            {
                 
-                // If the request was successful, parse the given data
-                if r.statusCode == 200 {
+                (data, response, error) in
+                
+                // This is the code run when the network request completes
+                // When the request completes:
+                //
+                // data - contains the data from the request
+                // response - contains the HTTP response code(s)
+                // error - contains any error messages, if applicable
+                
+                // Cast the NSURLResponse object into an NSHTTPURLResponse objecct
+                if let r = response as? NSHTTPURLResponse
+                {
                     
-                    // Show debug information (if a request was completed successfully)
-                    print("")
-                    print("====== data from the request follows ======")
-                    print(data)
-                    print("")
-                    print("====== response codes from the request follows ======")
-                    print(response)
-                    print("")
-                    print("====== errors from the request follows ======")
-                    print(error)
-                    
-                    if let d = data {
+                    // If the request was successful, parse the given data
+                    if r.statusCode == 200
+                    {
                         
-                        // Parse the retrieved data
-                        self.parseMyJSON(d)
+                        // Show debug information (if a request was completed successfully)
+                        print("")
+                        print("====== data from the request follows ======")
+                        print(data)
+                        print("")
+                        print("====== response codes from the request follows ======")
+                        print(response)
+                        print("")
+                        print("====== errors from the request follows ======")
+                        print(error)
+                        
+                        if let d = data {
+                            
+                            // Parse the retrieved data
+                            self.parseMyJSON(d)
+                            
+                        }
                         
                     }
                     
                 }
                 
             }
-            
-        }
         
         func createURL() -> String
         {
-            let url: String = frontURL + inputGiven.text! + ".json"
-            return url
+            if inputGiven.text! == ""
+            {
+                self.jsonResult.text = "Please enter a vaild currency code"
+                return ""
+            } else if let url: String = frontURL + inputGiven.text! + ".json"
+            {
+                return url
+            }
         }
         
         // Define a URL to retrieve a JSON file from
@@ -195,6 +205,9 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
                 
                 // Finally, we tell the task to start (despite the fact that the method is named "resume")
                 task.resume()
+                
+            } else {
+                self.jsonResult.text = "Please enter a vaild currency code"
                 
             }
         } else {
@@ -242,7 +255,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
         getData.addTarget(self, action: #selector(ViewController.getMyJSON), forControlEvents: UIControlEvents.TouchUpInside)
         
         // Set the button's title
-        getData.setTitle("Get my JSON!", forState: UIControlState.Normal)
+        getData.setTitle("How much does a bitcoin cost?", forState: UIControlState.Normal)
         
         // Required to auto layout this button
         getData.translatesAutoresizingMaskIntoConstraints = false
